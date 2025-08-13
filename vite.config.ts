@@ -123,6 +123,7 @@ export default defineConfig({
     sourcemap: true,
     assetsDir: '',
     copyPublicDir: false,
+    chunkSizeWarningLimit: 10240,
     emptyOutDir: true,
     minify: NO_MINIFY ? false : undefined,
     rollupOptions: {
