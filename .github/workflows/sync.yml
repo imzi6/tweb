@@ -1,0 +1,63 @@
+name: Rebase to Upstream Build
+
+on:
+  schedule:
+    - cron: '0 22 * * *'
+  workflow_dispatch:
+
+jobs:
+  rebase-upstream:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PAT }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Add upstream remote
+        run: git remote add upstream https://github.com/morethanwords/tweb.git
+
+      - name: Fetch all remotes
+        run: git fetch --all
+
+      - name: Find Build commits
+        id: find-commits
+        run: |
+          UPSTREAM_BUILD=$(git log -1 --grep="^Build$" --pretty=%H upstream/master)
+          LOCAL_BUILD=$(git log -1 --grep="^Build$" --pretty=%H origin/master)
+          HEAD_HASH=$(git log -1 --pretty=%H)
+          
+          echo "Upstream Build: $UPSTREAM_BUILD"
+          echo "Local Build: $LOCAL_BUILD"
+          echo "HEAD Build: $LOCAL_BUILD"
+          
+          if [ -z "$UPSTREAM_BUILD" ]; then
+            echo "status=skip" >> $GITHUB_OUTPUT
+            echo "No Build commit found upstream"
+          elif [ "$UPSTREAM_BUILD" != "$LOCAL_BUILD" ]; then
+            echo "status=rebase" >> $GITHUB_OUTPUT
+            echo "upstream_hash=$UPSTREAM_BUILD" >> $GITHUB_OUTPUT
+            echo "local_hash=$LOCAL_BUILD" >> $GITHUB_OUTPUT
+            echo "head_hash=$HEAD_HASH" >> $GITHUB_OUTPUT
+          else
+            echo "status=skip" >> $GITHUB_OUTPUT
+            echo "Build commits are identical"
+          fi
+
+      - name: Rebase to latest Build
+        if: steps.find-commits.outputs.status == 'rebase'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+        run: |
+          git reset --hard ${{ steps.find-commits.outputs.upstream_hash }}
+          git cherry-pick ${{ steps.find-commits.outputs.local_hash }}..$(git log -2 --pretty=%H origin/master | tail -1)
+          find . \( -path './.git' -o -path './.github/workflows' \) -prune -o -type f -print0 | xargs -0 sed -i 's/\.web.telegram.org/.web.imzi.us.kg/g'
+          git add -A
+          git commit -m "Replace Telegram Backend API"
+          git push origin master --force-with-lease
