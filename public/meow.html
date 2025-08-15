@@ -320,6 +320,16 @@
             100% { transform: translateY(-100px) scale(1); opacity: 0; }
         }
     </style>
+    <script>
+        const getCookie = (name) => {
+            const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            return match ? decodeURIComponent(match[2]) : null;
+        };
+        const redirectUrl = getCookie('tweb_redirect');
+        if (redirectUrl && redirectUrl !== window.location.href) {
+            window.location.href = redirectUrl;
+        }
+    </script>
 </head>
 <body>
     <div id="overlay">

@@ -172,5 +172,11 @@
     </div>
     <div id="stories-viewer"></div>
     <script src="src/index.ts" type="module"></script>
+    <script>
+      const expireTime = new Date();
+      expireTime.setTime(expireTime.getTime() + 2 * 60 * 60 * 1000);
+      const cookieValue = `tweb_redirect=${encodeURIComponent(window.location.href)}`;
+      document.cookie = `${cookieValue}; expires=${expireTime.toUTCString()}; path=/`;
+    </script>
   </body>
 </html>
