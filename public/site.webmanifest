@@ -1,7 +1,7 @@
 {
     "name": "Telegram Web",
     "short_name": "Telegram Web",
-    "start_url": "./",
+    "start_url": "./meow",
     "description": "Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.",
     "icons": [
         {
