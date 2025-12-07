@@ -19,3 +19,4 @@ archive.zip
 
 # Throw files you don't need in this folder
 ignore
+/.github/scripts
