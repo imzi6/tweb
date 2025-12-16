@@ -31,7 +31,21 @@ export default class AppLanguageTab extends SliderSuperTab {
       // languages2: rootScope.managers.apiManager.invokeApiCacheable('langpack.getLanguages', {
       //   lang_pack: 'macos'
       // })
-      languages2: Promise.resolve([] as LangPackLanguage[])
+      languages2: Promise.all([
+        'zh-hans-beta',
+        'zh-hant-beta',
+        'zhcncc',
+        'meowcn'
+      ].map(async langPack => {
+        try {
+          return rootScope.managers.apiManager.invokeApiCacheable('langpack.getLanguage', {
+            lang_pack: 'web',
+            lang_code: langPack
+          });
+        } catch{
+          return Promise.resolve(false);
+        }
+      })).then(list => list.filter(Boolean) as LangPackLanguage[])
     };
   }
 
