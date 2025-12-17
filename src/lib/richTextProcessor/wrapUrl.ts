@@ -38,6 +38,8 @@ export default function wrapUrl(url: string, unsafe?: number | boolean) {
       onclick = 'invoice';
     } else if(/^\+/.test(fullPath) && !PHONE_NUMBER_REG_EXP.test(fullPath)) { // second regexp is for phone numbers (t.me/+38050...)
       onclick = 'joinchat';
+    } else if(path[0] === 'setlanguage' && path.length > 1) {
+      onclick = 'setlanguage';
     } else if(path[0]) switch(path[0]) {
       case 'm':
       case 'addlist':
@@ -50,7 +52,7 @@ export default function wrapUrl(url: string, unsafe?: number | boolean) {
       case 'giftcode':
       case 'share':
       case 'nft':
-        if(path.length !== 1 && !prefix) {
+        if(path.length > 1 && !prefix) {
           onclick = path[0];
           break;
         }
@@ -58,15 +60,13 @@ export default function wrapUrl(url: string, unsafe?: number | boolean) {
       default:
         if(path.length <= 2 || path[1]?.match(/^\d+(?:\?(?:comment|thread)=\d+)?$/) || ['s', 'c', 'a'].includes(path[1])) {
           onclick = 'im';
-          break;
         }
-
         break;
     }
   } else if((telescoPeMatch = url.match(/^(?:https?:\/\/)?telesco\.pe\/([^/?]+)\/(\d+)/))) {
     onclick = 'im';
   } else if((tgMatch = url.match(/tg:(?:\/\/)?(.+?)(?:\?|$)/))) {
-    onclick = 'tg_' + tgMatch[1] as any;
+    onclick = ('tg_' + tgMatch[1]) as any;
   }/*  else if(unsafe) {
     url = 'tg://unsafe_url?url=' + encodeURIComponent(url);
   } */

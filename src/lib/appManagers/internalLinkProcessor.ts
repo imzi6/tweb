@@ -19,7 +19,7 @@ import addAnchorListener from '../../helpers/addAnchorListener';
 import assumeType from '../../helpers/assumeType';
 import findUpClassName from '../../helpers/dom/findUpClassName';
 import {User, AttachMenuPeerType, MessagesBotApp, BotApp, ChatlistsChatlistInvite, Chat, InputInvoice} from '../../layer';
-import {i18n, LangPackKey, _i18n} from '../langPack';
+import {i18n, LangPackKey, _i18n, I18n} from '../langPack';
 import {PHONE_NUMBER_REG_EXP} from '../richTextProcessor';
 import {isWebAppNameValid} from '../richTextProcessor/validators';
 import appImManager from './appImManager';
@@ -620,6 +620,37 @@ export class InternalLinkProcessor {
         return this.processInternalLink(link);
       }
     });
+
+    // t.me/setlanguage/zh-hans or t.me/setlanguage/en
+    addAnchorListener<{pathnameParams: ['setlanguage', string]}>({
+      name: 'setlanguage',
+      callback: ({pathnameParams}) => {
+        if(!pathnameParams[1]) {
+          return;
+        }
+
+        const link: InternalLink = {
+          _: INTERNAL_LINK_TYPE.SET_LANGUAGE,
+          lang: pathnameParams[1]
+        };
+
+        return this.processInternalLink(link);
+      }
+    });
+
+    // tg://setlanguage?lang=zh-hans
+    addAnchorListener<{
+      uriParams: {
+        lang: string
+      }
+    }>({
+      name: 'setlanguage',
+      protocol: 'tg',
+      callback: ({uriParams}) => {
+        const link = this.makeLink(INTERNAL_LINK_TYPE.SET_LANGUAGE, uriParams);
+        return this.processInternalLink(link);
+      }
+    });
   }
 
   private makeLink<T extends INTERNAL_LINK_TYPE>(type: T, uriParams: Omit<InternalLinkTypeMap[T], '_'>) {
@@ -1071,6 +1102,33 @@ export class InternalLinkProcessor {
     appSidebarRight.sharedMediaTab.setSearchTab('stories');
   }
 
+  public processSetLanguageLink = (link: InternalLink.InternalLinkSetLanguage) => {
+    const langCode = link.lang;
+
+    // Create a language name element
+    const langNameEl = document.createElement('span');
+    _i18n(langNameEl, `Language.${langCode}` as any);
+
+    const popup = PopupElement.createPopup(PopupPeer, 'popup-set-language', {
+      titleLangKey: 'OpenUrlTitle',
+      descriptionLangKey: 'OpenUrlAlert2',
+      descriptionLangArgs: [langNameEl],
+      buttons: [{
+        langKey: 'OK',
+        callback: () => {
+          I18n.getLangPackAndApply(langCode);
+          popup.hide();
+        }
+      }, {
+        langKey: 'Cancel',
+        isCancel: true
+      }]
+    });
+
+    popup.show();
+    return popup;
+  }
+
   public processInternalLink(link: InternalLink) {
     const map: {
       [key in InternalLink['_']]?: (link: any) => any
@@ -1095,7 +1153,8 @@ export class InternalLinkProcessor {
       [INTERNAL_LINK_TYPE.SHARE]: this.processShareLink,
       [INTERNAL_LINK_TYPE.UNIQUE_STAR_GIFT]: this.processUniqueStarGiftLink,
       [INTERNAL_LINK_TYPE.STAR_GIFT_COLLECTION]: this.processStarGiftCollectionLink,
-      [INTERNAL_LINK_TYPE.STORY_ALBUM]: this.processStoryAlbumLink
+      [INTERNAL_LINK_TYPE.STORY_ALBUM]: this.processStoryAlbumLink,
+      [INTERNAL_LINK_TYPE.SET_LANGUAGE]: this.processSetLanguageLink
     };
 
     const processor = map[link._];
