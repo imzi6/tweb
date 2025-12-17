@@ -1,6 +1,6 @@
 /*
  * https://github.com/morethanwords/tweb
- * Copyright (C) 2019-2021 Eduard Kuzmenko
+ * Copyright(C) 2019-2021 Eduard Kuzmenko
  * https://github.com/morethanwords/tweb/blob/master/LICENSE
  */
 
@@ -19,7 +19,7 @@ import addAnchorListener from '../../helpers/addAnchorListener';
 import assumeType from '../../helpers/assumeType';
 import findUpClassName from '../../helpers/dom/findUpClassName';
 import {User, AttachMenuPeerType, MessagesBotApp, BotApp, ChatlistsChatlistInvite, Chat, InputInvoice} from '../../layer';
-import {i18n, LangPackKey, _i18n} from '../langPack';
+import {i18n, LangPackKey, _i18n, I18n} from '../langPack';
 import {PHONE_NUMBER_REG_EXP} from '../richTextProcessor';
 import {isWebAppNameValid} from '../richTextProcessor/validators';
 import appImManager from './appImManager';
@@ -87,7 +87,7 @@ export class InternalLinkProcessor {
       }
     });
 
-    addAnchorListener<{uriParams: {command: string, bot: string}}>({
+    addAnchorListener<{uriParams: {command: string, bot: string} }>({
       name: 'execBotCommand',
       callback: ({uriParams}) => {
         const {command, bot} = uriParams;
@@ -104,7 +104,7 @@ export class InternalLinkProcessor {
       }
     });
 
-    addAnchorListener<{uriParams: {hashtag: string}}>({
+    addAnchorListener<{uriParams: {hashtag: string} }>({
       name: 'searchByHashtag',
       callback: ({uriParams}) => {
         const {hashtag} = uriParams;
@@ -140,7 +140,7 @@ export class InternalLinkProcessor {
       'addstickers' | 'addemoji',
       INTERNAL_LINK_TYPE.STICKER_SET | INTERNAL_LINK_TYPE.EMOJI_SET
     ][]).forEach(([name, type]) => {
-      addAnchorListener<{pathnameParams: [typeof name, string]}>({
+      addAnchorListener<{pathnameParams: [typeof name, string] }>({
         name,
         callback: ({pathnameParams}) => {
           if(!pathnameParams[1]) {
@@ -185,7 +185,7 @@ export class InternalLinkProcessor {
     });
 
     // t.me/addlist/adasdasd
-    addAnchorListener<{pathnameParams: ['folder', string]}>({
+    addAnchorListener<{pathnameParams: ['folder', string] }>({
       name: 'addlist',
       callback: ({pathnameParams}) => {
         const link: InternalLink = {
@@ -198,7 +198,7 @@ export class InternalLinkProcessor {
     });
 
     // Support old t.me/joinchat/asd and new t.me/+asd
-    addAnchorListener<{pathnameParams: ['joinchat', string]}>({
+    addAnchorListener<{pathnameParams: ['joinchat', string] }>({
       name: 'joinchat',
       callback: ({pathnameParams}) => {
         const link: InternalLink = {
@@ -233,11 +233,11 @@ export class InternalLinkProcessor {
     type K8 = {text?: string};
 
     addAnchorListener<{
-    //   pathnameParams: ['c', string, string],
-    //   uriParams: {thread?: number}
-    // } | {
-    //   pathnameParams: [string, string?],
-    //   uriParams: {comment?: number}
+      //   pathnameParams: ['c', string, string],
+      //   uriParams: {thread?: number}
+      // } | {
+      //   pathnameParams: [string, string?],
+      //   uriParams: {comment?: number}
       pathnameParams: ['c', string, string] | [string, string?],
       uriParams: K1 | K2 | K3 | K4 | K5 | K6 | K7 | K8
     }>({
@@ -476,7 +476,7 @@ export class InternalLinkProcessor {
     });
 
     // t.me/boost/adasdasd
-    addAnchorListener<{pathnameParams: ['boost', string]}>({
+    addAnchorListener<{pathnameParams: ['boost', string] }>({
       name: 'boost',
       callback: ({pathnameParams}) => {
         const link: InternalLink = {
@@ -503,7 +503,7 @@ export class InternalLinkProcessor {
     });
 
     // t.me/giftcode/slug
-    addAnchorListener<{pathnameParams: ['giftcode', string]}>({
+    addAnchorListener<{pathnameParams: ['giftcode', string] }>({
       name: 'giftcode',
       callback: ({pathnameParams, element}) => {
         const link: InternalLink = {
@@ -532,7 +532,7 @@ export class InternalLinkProcessor {
     });
 
     // t.me/m/slug
-    addAnchorListener<{pathnameParams: ['m', string]}>({
+    addAnchorListener<{pathnameParams: ['m', string] }>({
       name: 'm',
       callback: ({pathnameParams}) => {
         const link: InternalLink = {
@@ -574,7 +574,7 @@ export class InternalLinkProcessor {
     });
 
     // t.me/share/url?url=...&text=...
-    addAnchorListener<{pathnameParams: ['share', 'url'], uriParams: {url?: string, text?: string}}>({
+    addAnchorListener<{pathnameParams: ['share', 'url'], uriParams: {url?: string, text?: string} }>({
       name: 'share',
       callback: ({pathnameParams, uriParams}) => {
         const link: InternalLink = {
@@ -607,7 +607,7 @@ export class InternalLinkProcessor {
     });
 
     // t.me/nft/asdasd-1
-    addAnchorListener<{pathnameParams: ['nft', string]}>({
+    addAnchorListener<{pathnameParams: ['nft', string] }>({
       name: 'nft',
       callback: ({pathnameParams}) => {
         const link: InternalLink = {
@@ -740,6 +740,38 @@ export class InternalLinkProcessor {
           // case 'manage':
           // case 'sort':
         }
+      }
+    });
+
+    addAnchorListener<{
+      pathnameParams: ['setlanguage', string]
+    }>({
+      name: 'setlanguage',
+      callback: ({pathnameParams}) => {
+        if(!pathnameParams[1]) {
+          return;
+        }
+
+        const link: InternalLink = {
+          _: INTERNAL_LINK_TYPE.SET_LANGUAGE,
+          lang: pathnameParams[1]
+        };
+
+        return this.processInternalLink(link);
+      }
+    });
+
+    // tg://setlanguage?lang=zh-hans
+    addAnchorListener<{
+      uriParams: {
+        lang: string
+      }
+    }>({
+      name: 'setlanguage',
+      protocol: 'tg',
+      callback: ({uriParams}) => {
+        const link = this.makeLink(INTERNAL_LINK_TYPE.SET_LANGUAGE, uriParams);
+        return this.processInternalLink(link);
       }
     });
   }
@@ -1200,6 +1232,33 @@ export class InternalLinkProcessor {
     });
   };
 
+  public processSetLanguageLink = (link: InternalLink.InternalLinkSetLanguage) => {
+    const langCode = link.lang;
+
+    // Create a language name element
+    const langNameEl = document.createElement('span');
+    _i18n(langNameEl, `Language.${langCode}` as any);
+
+    const popup = PopupElement.createPopup(PopupPeer, 'popup-set-language', {
+      titleLangKey: 'OpenUrlTitle',
+      descriptionLangKey: 'OpenUrlAlert2',
+      descriptionLangArgs: [langNameEl],
+      buttons: [{
+        langKey: 'OK',
+        callback: () => {
+          I18n.getLangPackAndApply(langCode);
+          popup.hide();
+        }
+      }, {
+        langKey: 'Cancel',
+        isCancel: true
+      }]
+    });
+
+    popup.show();
+    return popup;
+  }
+
   public processInternalLink(link: InternalLink) {
     const map: {
       [key in InternalLink['_']]?: (link: any) => any
@@ -1225,7 +1284,8 @@ export class InternalLinkProcessor {
       [INTERNAL_LINK_TYPE.UNIQUE_STAR_GIFT]: this.processUniqueStarGiftLink,
       [INTERNAL_LINK_TYPE.STAR_GIFT_COLLECTION]: this.processStarGiftCollectionLink,
       [INTERNAL_LINK_TYPE.STORY_ALBUM]: this.processStoryAlbumLink,
-      [INTERNAL_LINK_TYPE.INSTANT_VIEW]: this.processInstantViewLink
+      [INTERNAL_LINK_TYPE.INSTANT_VIEW]: this.processInstantViewLink,
+      [INTERNAL_LINK_TYPE.SET_LANGUAGE]: this.processSetLanguageLink
     };
 
     const processor = map[link._];

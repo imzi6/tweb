@@ -33,7 +33,8 @@ export enum INTERNAL_LINK_TYPE {
   INSTANT_VIEW,
   NEW,
   SETTINGS,
-  CONTACTS
+  CONTACTS,
+  SET_LANGUAGE
 };
 
 export type InternalLink =
@@ -61,7 +62,8 @@ export type InternalLink =
   InternalLink.InternalLinkInstantView |
   InternalLink.InternalLinkNew |
   InternalLink.InternalLinkSettings |
-  InternalLink.InternalLinkContacts;
+  InternalLink.InternalLinkContacts |
+  InternalLink.InternalLinkSetLanguage;
 
 export namespace InternalLink {
   export interface InternalLinkMessage {
@@ -223,6 +225,11 @@ export namespace InternalLink {
     _: INTERNAL_LINK_TYPE.CONTACTS,
     type?: 'search' | 'sort' | 'new' | 'invite' | 'manage'
   }
+
+  export interface InternalLinkSetLanguage {
+    _: INTERNAL_LINK_TYPE.SET_LANGUAGE,
+    lang: string
+  }
 }
 
 export type InternalLinkTypeMap = {
@@ -251,4 +258,5 @@ export type InternalLinkTypeMap = {
   [INTERNAL_LINK_TYPE.NEW]: InternalLink.InternalLinkNew,
   [INTERNAL_LINK_TYPE.SETTINGS]: InternalLink.InternalLinkSettings,
   [INTERNAL_LINK_TYPE.CONTACTS]: InternalLink.InternalLinkContacts
+  [INTERNAL_LINK_TYPE.SET_LANGUAGE]: InternalLink.InternalLinkSetLanguage
 };

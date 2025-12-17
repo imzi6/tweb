@@ -36,16 +36,10 @@ export default class AppLanguageTab extends SliderSuperTab {
         'zh-hant-beta',
         'zhcncc',
         'meowcn'
-      ].map(async langPack => {
-        try {
-          return rootScope.managers.apiManager.invokeApiCacheable('langpack.getLanguage', {
-            lang_pack: 'web',
-            lang_code: langPack
-          });
-        } catch{
-          return Promise.resolve(false);
-        }
-      })).then(list => list.filter(Boolean) as LangPackLanguage[])
+      ].map(langPack => rootScope.managers.apiManager.invokeApiCacheable('langpack.getLanguage', {
+        lang_pack: 'web',
+        lang_code: langPack
+      }))).then(results => results.flat())
     };
   }
 
