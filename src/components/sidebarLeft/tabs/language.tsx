@@ -133,7 +133,7 @@ export default class AppLanguageTab extends SliderSuperTab {
       p.languages2
     ]).then(([languages1, languages2]) => {
       const rendered: Set<string> = new Set();
-      const webLangCodes = languages1.map((language) => language.lang_code);
+      const webLangCodes = languages1.concat(languages2).map((language) => language.lang_code);
 
       const random = randomLong();
       languages1.concat(languages2).forEach((language) => {
