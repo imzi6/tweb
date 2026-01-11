@@ -46,7 +46,7 @@ import {clearSensitiveSpoilers} from '@components/wrappers/mediaSpoiler';
 import useContentSettings from '@stores/contentSettings';
 import ChangeLoginEmailTab from '@components/sidebarLeft/tabs/changeLoginEmail';
 import {wrapEmailPattern} from '@components/popups/emailSetup';
-import IS_WEB_AUTHN_SUPPORTED from '@environment/webAuthn';
+import {IS_PASSKEY_ENABLED} from '@environment/webAuthn';
 import showPasskeyPopup from '@components/popups/passkey';
 import {findExistingOrCreateCustomOption} from '@components/sidebarLeft/tabs/autoDeleteMessages/options';
 import {useSuperTab} from '@components/solidJsTabs/superTabProvider';
@@ -102,7 +102,7 @@ const PrivacyAndSecurity: Component = () => {
           _i18n(passkeyRow.subtitle, 'Passkeys', [passkeys.length]);
           passkeyRow.container.classList.toggle(
             'hide',
-            !passkeys.length && (!appConfig.settings_display_passkeys || !IS_WEB_AUTHN_SUPPORTED)
+            !passkeys.length && (!appConfig.settings_display_passkeys || !IS_PASSKEY_ENABLED)
           );
         });
       });

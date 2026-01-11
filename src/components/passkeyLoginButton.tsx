@@ -1,6 +1,6 @@
 import {createSignal, JSX, onMount} from 'solid-js';
 
-import IS_WEB_AUTHN_SUPPORTED from '@environment/webAuthn';
+import {IS_PASSKEY_ENABLED} from '@environment/webAuthn';
 import {AuthPasskeyLoginOptions, InputPasskeyResponse} from '@layer';
 import AccountController from '@lib/accounts/accountController';
 import {changeAccount} from '@lib/accounts/changeAccount';
@@ -17,7 +17,7 @@ let _fetchPasskeyOptionPromise: Promise<[TrueDcId, AuthPasskeyLoginOptions]>;
 export default function PasskeyLoginButton(props: {
   disabled?: boolean
 } = {}): JSX.Element {
-  if(!IS_WEB_AUTHN_SUPPORTED) return null;
+  if(!IS_PASSKEY_ENABLED) return null;
 
   const [visible, setVisible] = createSignal(false);
   const [submitting, setSubmitting] = createSignal(false);

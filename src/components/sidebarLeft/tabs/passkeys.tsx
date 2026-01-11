@@ -9,7 +9,7 @@ import createMiddleware from '@helpers/solid/createMiddleware';
 import styles from '@components/sidebarLeft/tabs/passkeys.module.scss';
 import {Passkey} from '@layer';
 import showPasskeyPopup, {createPasskey} from '@components/popups/passkey';
-import IS_WEB_AUTHN_SUPPORTED from '@environment/webAuthn';
+import {IS_PASSKEY_ENABLED} from '@environment/webAuthn';
 import Button from '@components/buttonTsx';
 import {useHotReloadGuard} from '@lib/solidjs/hotReloadGuard';
 import findAndSplice from '@helpers/array/findAndSplice';
@@ -91,7 +91,7 @@ const PasskeysTab = () => {
   };
 
   createEffect(() => {
-    if(!tab.payload.passkeys.length && !IS_WEB_AUTHN_SUPPORTED) {
+    if(!tab.payload.passkeys.length && !IS_PASSKEY_ENABLED) {
       tab.close();
     }
   });
@@ -112,7 +112,7 @@ const PasskeysTab = () => {
         </For>
         <Show
           when={
-            IS_WEB_AUTHN_SUPPORTED &&
+            IS_PASSKEY_ENABLED &&
             tab.payload.passkeys.length < appConfig.passkeys_account_passkeys_max
           }
         >

@@ -1,4 +1,4 @@
-import IS_WEB_AUTHN_SUPPORTED from '@environment/webAuthn';
+import {IS_PASSKEY_ENABLED} from '@environment/webAuthn';
 import {Passkey} from '@layer';
 import {getInputPasskeyCredential} from '@appManagers/utils/account/getInputPasskeyResponse';
 import {i18n} from '@lib/langPack';
@@ -9,14 +9,6 @@ import showFeatureDetailsPopup from '@components/popups/featureDetails';
 export async function createPasskey() {
   const registrationOptions = await rootScope.managers.appAccountManager.initPasskeyRegistration();
   const publicKeyCredentialCreationOptions = PublicKeyCredential.parseCreationOptionsFromJSON(JSON.parse(registrationOptions.options.data).publicKey);
-
-  // if(IS_BETA) {
-  //   console.log(publicKeyCredentialCreationOptions);
-  //   publicKeyCredentialCreationOptions.rp = {
-  //     id: 'localhost',
-  //     name: 'Telegram Messenger'
-  //   };
-  // }
 
   try {
     const credential = await navigator.credentials.create({publicKey: publicKeyCredentialCreationOptions});
@@ -43,7 +35,7 @@ export default function showPasskeyPopup(onCreation?: (passkey: Passkey) => void
     },
     title: i18n('Passkey.Title'),
     subtitle: i18n('Passkey.Subtitle'),
-    buttons: IS_WEB_AUTHN_SUPPORTED ? [{
+    buttons: IS_PASSKEY_ENABLED ? [{
       text: i18n('Passkey.Create'),
       onClick: async(close) => {
         try {

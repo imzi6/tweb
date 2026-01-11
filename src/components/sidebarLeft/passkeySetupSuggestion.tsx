@@ -1,7 +1,7 @@
 import showPasskeyPopup from '@components/popups/passkey';
 import type {PendingSuggestionController} from '@components/sidebarLeft/pendingSuggestionController';
 import {SimpleSuggestion} from '@components/sidebarLeft/pendingSuggestionItem';
-import IS_WEB_AUTHN_SUPPORTED from '@environment/webAuthn';
+import {IS_PASSKEY_ENABLED} from '@environment/webAuthn';
 import {i18n} from '@lib/langPack';
 import wrapEmojiText from '@lib/richTextProcessor/wrapEmojiText';
 import rootScope from '@lib/rootScope';
@@ -37,7 +37,7 @@ export default function createPasskeySetupSuggestion(): PendingSuggestionControl
   const pendingSuggestions = usePendingSuggestions();
 
   return {
-    available: () => IS_WEB_AUTHN_SUPPORTED && pendingSuggestions().has(PASSKEY_SETUP_KEY),
+    available: () => IS_PASSKEY_ENABLED && pendingSuggestions().has(PASSKEY_SETUP_KEY),
     component: PasskeySetupSuggestion
   };
 }
