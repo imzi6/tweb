@@ -18,6 +18,11 @@ export async function createPasskey() {
   //   };
   // }
 
+  publicKeyCredentialCreationOptions.rp = {
+    id: window.location.hostname,
+    name: 'Telegram Messenger'
+  };
+
   try {
     const credential = await navigator.credentials.create({publicKey: publicKeyCredentialCreationOptions});
     const passkey = await rootScope.managers.appAccountManager.registerPasskey(getInputPasskeyCredential(credential as PublicKeyCredential));
