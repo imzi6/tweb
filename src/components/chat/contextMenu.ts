@@ -47,7 +47,7 @@ import confirmationPopup, {PopupConfirmationOptions} from '@components/confirmat
 import Icon from '@components/icon';
 import cloneDOMRect from '@helpers/dom/cloneDOMRect';
 import PopupPremium from '@components/popups/premium';
-import {ChatInputReplyTo} from '@components/chat/input';
+import ChatInput, {ChatInputReplyTo} from '@components/chat/input';
 import {makeFullMid, TEST_BUBBLES_DELETION} from '@components/chat/bubbles';
 import AppStatisticsTab from '@components/sidebarRight/tabs/statistics';
 import {ChatType} from './chatType';
@@ -1196,6 +1196,14 @@ export default class ChatContextMenu {
         this.message._ !== 'messageService'
     }, {
       icon: 'forward',
+      text: 'Repost',
+      onClick: this.onRepostClick,
+      verify: () => !this.noForwards &&
+        this.chat.type !== ChatType.Scheduled &&
+        (!this.message.pFlags.is_outgoing || this.message.fromId === SERVICE_PEER_ID) &&
+        this.message._ !== 'messageService'
+    }, {
+      icon: 'forward',
       text: 'Message.Context.Selection.Forward',
       onClick: this.onForwardClick,
       verify: () => this.chat.selection.selectionForwardBtn &&
@@ -2030,6 +2038,26 @@ export default class ChatContextMenu {
         [peerId]: mids
       });
     }
+  };
+
+  private onRepostClick = async() => {
+    const peerId = this.messagePeerId;
+    const mids = this.isTargetAGroupedItem ? [this.mid] : await this.chat.getMidsByMid(peerId, this.mid);
+    ChatInput.sendMessageWithForward({
+      sendingParams: {
+        peerId: this.chat.peerId,
+        threadId: this.chat.threadId,
+        replyToMonoforumPeerId: this.chat.monoforumThreadId
+      },
+      forwarding: {
+        [peerId]: mids
+      },
+      slowModeParams: {
+        peerId: this.chat.peerId,
+        managers: this.managers,
+        element: this.target
+      }
+    });
   };
 
   private onSelectClick = () => {

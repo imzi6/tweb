@@ -1477,6 +1477,7 @@ const lang = {
   'Reply': 'Reply',
   'Edit': 'Edit',
   'Forward': 'Forward',
+  'Repost': 'Repost',
   'CopyLink': 'Copy Link',
   'Copy': 'Copy',
   'Search': 'Search',
